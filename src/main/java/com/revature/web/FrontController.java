@@ -16,6 +16,7 @@ import com.revature.controllers.UserController;
 import com.revature.exceptions.AuthorizationException;
 import com.revature.exceptions.NotLoggedInException;
 import com.revature.models.Account;
+import com.revature.models.AccountUser;
 import com.revature.models.User;
 import com.revature.templates.MessageTemplate;
 
@@ -23,6 +24,7 @@ public class FrontController extends HttpServlet {
 	private static final long serialVersionUID = -4854248294011883310L;
 	private static final UserController userController = new UserController();
 	private static final AccountController accountController = new AccountController();
+	private static final AccountUser accountUser = new AccountUser();
 	private static final ObjectMapper om = new ObjectMapper();
 
 	@Override
@@ -70,11 +72,20 @@ public class FrontController extends HttpServlet {
 				}
 				if(portions.length > 2) {
 					if(portions[1] == "status") {
+						System.out.println("hi2");
 						int status_id = Integer.parseInt(portions[2]);
 						AuthService.guard(req.getSession(false), "Employee", "Admin");
 						List<Account> accountList = accountController.findAccountByStatus(status_id);
 						res.setStatus(200);
 						res.getWriter().println(om.writeValueAsString(accountList));
+					}
+					if(portions[1] == "users") {
+						System.out.println("hi");
+						int user_id = Integer.parseInt(portions[2]);
+						AuthService.guard(req.getSession(false), user_id, "Employee", "Admin");
+						AccountUser a = accountController.findAccountByUserId(user_id);
+						res.setStatus(200);
+						res.getWriter().println(om.writeValueAsString(a));
 					}
 				}
 				else {

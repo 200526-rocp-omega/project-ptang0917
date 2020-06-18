@@ -11,6 +11,7 @@ import java.util.List;
 import com.revature.models.Account;
 import com.revature.models.AccountStatus;
 import com.revature.models.AccountType;
+import com.revature.models.AccountUser;
 import com.revature.util.ConnectionUtil;
 
 public class AccountDAO implements IAccountDAO {
@@ -136,22 +137,21 @@ public class AccountDAO implements IAccountDAO {
 		return allAccount;
 	}
 
-	public Account findAccountByUserId(int user_id) {
+	public AccountUser findAccountByUserId(int user_id) {
 		try (Connection conn = ConnectionUtil.getConnection()) {
 			String sql = "SELECT * FROM ACCOUNT INNER JOIN USERS_ACCOUNTS ON USERS_ACCOUNTS.ACCOUNT_ID = ACCOUNT.ID WHERE USER_ID = ?";
 			PreparedStatement stmt = conn.prepareStatement(sql);
+			stmt.setInt(1, user_id);
 			ResultSet rs = stmt.executeQuery();
 			while (rs.next()) {
-				int account_id = rs.getInt("account_id");
+				int account_id = rs.getInt("id");
 				double balance = rs.getDouble("balance");
 				int statusId = rs.getInt("status_id");
-				String status = rs.getString("status");
 				int type_id = rs.getInt("type_id");
-				String type = rs.getString("type");
 				user_id = rs.getInt("user_id");
-				AccountStatus account_status = new AccountStatus(statusId, status);
-				AccountType account_type = new AccountType(type_id, type);
-				return new Account(account_id, balance, account_status, account_type);
+				int account_id2 = rs.getInt("account_id");
+
+				return new AccountUser(account_id, balance, statusId, type_id, user_id, account_id2);
 
 			}
 		} catch (SQLException e) {
